@@ -1,0 +1,8 @@
+#!/bin/bash
+rm -R arena
+mkdir arena
+cp one/one.go arena
+mv arena/one.go arena/one.txt
+python edit.py
+rm arena/one.txt
+cp engine.go arena
