@@ -1,0 +1,6 @@
+temp = open("temp.txt","r")
+info = temp.read()
+temp.close()
+players = open("players.txt","w")
+players.write(info)
+players.close()

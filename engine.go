@@ -1,18 +1,19 @@
 package main
 
+// Competition Engine
+
 import (
-	"fmt"
-	"bufio"
+	"time"
 	"os"
 	"strconv"
-	"strings"
-	"time"
 )
 
 var mainChain [][]int
 var scoreOne int = 0
-var scoreTwo int = 0
+var scoreTwo int = 3
 var move int = 1
+var whoAmI int = 0
+var turns int = 1
 
 func main() {
 	var strike1 int = 0
@@ -35,19 +36,14 @@ func main() {
 	var whoWon int
 	var t0 time.Time
 	var t1 time.Time
-	var n []int
 	var tempScore1 int
 	var tempScore2 int
 	var tempMove int
+	var tempTurn int
 	
-	// OPTIONS
-	var debug bool = true
-	var timing bool = false
-	var printScore bool = true
-	var showCoords bool = false
-	var moveCount bool = false
+	var timing bool = true
+	var moveCount bool = true
 	
-	reader := bufio.NewReader(os.Stdin)
 	sliceMain := make([][]int, 19)
 	for x := range sliceMain {
 		sliceMain[x] = make([]int, 19)
@@ -64,22 +60,31 @@ func main() {
 	var nextMove []int
 	
 	for mainLoop {
-		printBoard(sliceMain,showCoords)
-		if debug && revert2{
-			fmt.Print("-> ")
-			text, _ := reader.ReadString('\n')
-			if text == "stop\n" {
+		if revert2 {
+			tempScore1 = scoreOne
+			tempScore2 = scoreTwo
+			tempMove = move
+			whoAmI = 1
+			tempTurn = turns
+			
+			t0 = time.Now()
+			nextMove = returnMove1(sliceMain)
+			t1 = time.Now()
+			
+			if (t1.Sub(t0) > 60000000000 && timing) || tempScore1 != scoreOne || tempScore2 != scoreTwo || tempMove != move || turns != tempTurn {
+				whoWon = 2
 				break
-			} else if text == "-1 -1\n" || text == "-1 -1\r\n" {
+			}
+			
+			if nextMove[0] == -1 && nextMove[1] == -1 {
 				if pass {
 					break
 				} else {
 					pass = true
 				}
 			} else {
-				n = runParse(text, sliceMain)
-				if checkIllegal(n) {
-					sliceMain = makeMove(n[0], n[1], sliceMain, 1)
+				if checkIllegal(nextMove, sliceMain) {
+					sliceMain = makeMove(nextMove[0], nextMove[1], sliceMain, 1)
 					chains = findChains(sliceMain,2)
 					runDelete(sliceMain, chains, 2)
 					chains = findChains(sliceMain,1)
@@ -96,11 +101,20 @@ func main() {
 						}
 					} else {
 						ko1 = copyBoard(ko1, sliceMain)
+						gameState, err := os.Create("board/"+strconv.Itoa(turns)+".txt")
+						check(err)
+						defer gameState.Close()
+						for g := range sliceMain {
+							for h := range sliceMain[g] {
+								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
+							}
+						}
+						gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
+						turns++
 					}
 				} else {
 					revert1 = false
 					strike1++
-					fmt.Println("Strike:",strike1)
 					if strike1 == 3 {
 						whoWon = 2
 						break
@@ -115,12 +129,14 @@ func main() {
 			tempScore1 = scoreOne
 			tempScore2 = scoreTwo
 			tempMove = move
+			whoAmI = 2
+			tempTurn = turns
 			
 			t0 = time.Now()
-			nextMove = returnMove(sliceMain)
+			nextMove = returnMove2(sliceMain)
 			t1 = time.Now()
 			
-			if t1.Sub(t0) > 60000000000 && timing || tempScore1 != scoreOne || tempScore2 != scoreTwo || tempMove != move{
+			if t1.Sub(t0) > 60000000000 && timing || tempScore1 != scoreOne || tempScore2 != scoreTwo || tempMove != move || turns != tempTurn {
 				whoWon = 1
 				break
 			}
@@ -132,7 +148,7 @@ func main() {
 					pass = true
 				}
 			} else {
-				if checkIllegal(nextMove) {
+				if checkIllegal(nextMove, sliceMain) {
 					sliceMain = makeMove(nextMove[0], nextMove[1], sliceMain, 2)
 					chains = findChains(sliceMain,1)
 					runDelete(sliceMain, chains, 1)
@@ -150,14 +166,23 @@ func main() {
 						}
 					} else {
 						ko2 = copyBoard(ko2, sliceMain)
+						gameState, err := os.Create("board/"+strconv.Itoa(turns)+".txt")
+						check(err)
+						defer gameState.Close()
+						for g := range sliceMain {
+							for h := range sliceMain[g] {
+								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
+							}
+						}
+						gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
 						if moveCount {
 							move++
+							turns++
 						}
 					}
 				} else {
 					revert2 = false
 					strike2++
-					fmt.Println("Strike:",strike2)
 					if strike2 == 3 {
 						whoWon = 1
 						break
@@ -166,42 +191,30 @@ func main() {
 			}
 		}
 		revert1 = true
-		
-		if printScore {
-			fmt.Println("Player One Score:", scoreOne, "\nPlayer BOT Score:", scoreTwo)
-		}
 	}
+	
+	f, err := os.Create("data.txt")
+	check(err)
+	defer f.Close()
+
+	
 	if whoWon == 1 {
-		fmt.Println("Player 1 won by fault in player 2")
+		f.WriteString("1")
 	} else if whoWon == 2 {
-		fmt.Println("Player 2 won by fault in player 1")
+		f.WriteString("2")
 	} else {
 		endGame(sliceMain)
-		fmt.Println("\nEnd Game Score\nPlayer One Score:", scoreOne, "\nPlayer BOT Score:", scoreTwo)
+		if scoreOne>scoreTwo {
+			f.WriteString("1")
+		} else {
+			f.WriteString("2")
+		}
 	}
 	
-	/*
-	sliceMain = makeMove(4,4,sliceMain,1)
-	sliceMain = makeMove(4,5,sliceMain,1)
-	sliceMain = makeMove(7,7,sliceMain,1)
-	sliceMain = makeMove(6,7,sliceMain,2)
-	sliceMain = makeMove(8,7,sliceMain,2)
-	sliceMain = makeMove(7,6,sliceMain,2)
-	sliceMain = makeMove(7,8,sliceMain,2)
-	chains := findChains(sliceMain,1)
-	
-	for x := range chains{
-		printBoard(chains[x])
-		fmt.Println("-----")
-	}
-	
-	runDelete(sliceMain, chains, 1)
-	printBoard(sliceMain)
-	*/
 }
 
-func checkIllegal(check []int) bool {
-	if check[0] < -1 || check[1] < -1 || check[0] > 18 || check[1] > 18 {
+func checkIllegal(check []int, sliceMain [][]int) bool {
+	if check[0] < -1 || check[1] < -1 || check[0] > 18 || check[1] > 18 || sliceMain[check[0]][check[1]] != 0 {
 		return false
 	}
 	return true
@@ -214,30 +227,6 @@ func copyBoard(a [][]int, b [][]int) [][]int {
 	return a
 }
 
-func runParse(text string, sliceMain [][]int) []int {
-	if isWindows() {
-		text = text[:len(text)-2]
-	} else {
-		text = text[:len(text)-1]
-	}
-	s := strings.Split(text, " ")
-	n := make([]int, 2)
-	a, err := strconv.ParseInt(s[0], 10, 64)
-	if err != nil || -1 > a || a > 18 {
-		fmt.Println(err)
-		n[0], n[1] = 20, 20
-		return n
-	}
-	b, err := strconv.ParseInt(s[1], 10, 64)
-	if err != nil || -1 > b || b > 18 {
-		fmt.Println(err)
-		n[0], n[1] = 20, 20
-		return n
-	}
-	n[0], n[1] = int(b), int(a)
-	return n
-}
-
 func makeMove(a int, b int, sliceMain [][]int, changed int) [][]int {
 	if sliceMain[a][b] == 0 {
 		sliceMain[a][b] = changed
@@ -248,24 +237,6 @@ func makeMove(a int, b int, sliceMain [][]int, changed int) [][]int {
 func Delete(a int, b int, sliceMain [][]int) [][]int {
 	sliceMain[a][b] = 0
 	return sliceMain
-}
-
-func printBoard(sliceMain [][]int, display bool) {
-	if display {
-		fmt.Println("   0 1 2 3 4 5 6 7 8 9 ...")
-	}
-	for x := range sliceMain {
-		if display {
-			if x<10{
-				fmt.Println(x,sliceMain[x])
-			} else {
-				fmt.Println(" ",sliceMain[x])
-			}
-		} else {
-			fmt.Println(sliceMain[x])
-		}
-	}
-	fmt.Println("---------------------------------------")
 }
 
 func runDelete(sliceMain [][]int, chains [][][]int, player int) [][]int{
@@ -286,6 +257,12 @@ func runDelete(sliceMain [][]int, chains [][][]int, player int) [][]int{
 		}
 	}
 	return sliceMain
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
 
 func findChains(sliceMain [][]int, player int) [][][]int{
@@ -454,10 +431,6 @@ func whoLand(sliceMain [][]int, chain [][]int, player int) bool {
 		}
 	}
 	return true
-}
-
-func isWindows() bool {
-    return os.PathSeparator == '\\' && os.PathListSeparator == ';'
 }
 
 func findEndgame(sliceMain [][]int) [][][]int{

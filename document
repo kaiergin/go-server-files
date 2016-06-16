@@ -1,8 +1,32 @@
 #!/bin/bash
+input="players.txt"
+it=0
+while IFS= read -r var
+do
+if [ $it -ne 0 ];
+then
 rm -R arena
 mkdir arena
-cp one/one.go arena
-mv arena/one.go arena/one.txt
+cp $var/$var.go arena
+cp $prev/$prev.go arena
+mv arena/$var.go arena/$var.txt
+mv arena/$prev.go arena/$prev.txt
 python edit.py
-rm arena/one.txt
+if [ ! -f arena/error.txt ];
+then
+rm arena/$var.txt
+rm arena/$prev.txt
 cp engine.go arena
+cd arena
+mkdir board
+go build
+./arena
+cd ..
+fi
+python record.py
+fi
+prev=$var
+it=$((it+1))
+done < "$input"
+python end.py
+rm temp.txt
