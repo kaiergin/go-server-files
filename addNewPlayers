@@ -1,0 +1,18 @@
+#!/bin/bash
+FILES="NewAIs/*"
+BROKEN="BROKEN"
+for x in $FILES
+do
+if [ $x != "NewAIs/*" ];
+then
+OUTPUT="$(python checkLegal.py $x)"
+if [ $OUTPUT != $BROKEN ];
+then
+if [ -f $OUTPUT/$OUTPUT.go ];
+then
+rm $OUTPUT/$OUTPUT.go
+fi
+mv $x $OUTPUT
+fi
+fi
+done

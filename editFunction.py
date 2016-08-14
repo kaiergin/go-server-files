@@ -1,6 +1,8 @@
 import os
 import fileinput
 
+# This changes the names of the AIs functions so they are different
+
 listfiles = os.listdir("arena")
 y = 0
 info = open("arena/info.txt","w")

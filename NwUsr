@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "New user's name"
+read name
+echo "New username"
+read username
+echo "New password"
+read password
+mkdir $username
+python mkusr.py $name $username $password

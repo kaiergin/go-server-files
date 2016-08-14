@@ -1,2 +1,2 @@
-one
+GoBotGamma
 GoBotAlpha

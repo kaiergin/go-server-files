@@ -1,6 +1,9 @@
 #!/bin/bash
 input="players.txt"
 it=0
+
+./addNewPlayers
+
 while IFS= read -r var
 do
 if [ $it -ne 0 ];
@@ -11,7 +14,7 @@ cp $var/$var.go arena
 cp $prev/$prev.go arena
 mv arena/$var.go arena/$var.txt
 mv arena/$prev.go arena/$prev.txt
-python edit.py
+python editFunction.py
 if [ ! -f arena/error.txt ];
 then
 rm arena/$var.txt
@@ -23,7 +26,7 @@ go build
 ./arena
 cd ..
 fi
-python record.py
+python recordLeaderboard.py
 fi
 prev=$var
 it=$((it+1))

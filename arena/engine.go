@@ -210,7 +210,10 @@ func main() {
 			f.WriteString("2")
 		}
 	}
-	
+	/*
+	f.WriteString(strconv.Itoa(scoreOne))
+	f.WriteString(strconv.Itoa(scoreTwo))
+	*/
 }
 
 func checkIllegal(check []int, sliceMain [][]int) bool {
