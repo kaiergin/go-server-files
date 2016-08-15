@@ -12,7 +12,20 @@ if [ -f $OUTPUT/$OUTPUT.go ];
 then
 rm $OUTPUT/$OUTPUT.go
 fi
-mv $x $OUTPUT
+rm -R TEST
+mkdir TEST
+cp $x TEST
+cp tester.go TEST
+cp one/one.go TEST
+cd TEST
+go build
+./TEST
+cd ..
+if [ -f TEST/complete.txt ];
+then
+cp $x $OUTPUT
+fi
+rm $x
 fi
 fi
 done

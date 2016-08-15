@@ -1,6 +1,6 @@
-<games>
-<play>
+<all>
+<game>
 <playerone>Test1</playerone>
 <playertwo>Test2</playertwo>
-</play>
-</games>
+</game>
+</all>

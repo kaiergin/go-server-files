@@ -101,15 +101,6 @@ func main() {
 						}
 					} else {
 						ko1 = copyBoard(ko1, sliceMain)
-						gameState, err := os.Create("board/"+strconv.Itoa(turns)+".txt")
-						check(err)
-						defer gameState.Close()
-						for g := range sliceMain {
-							for h := range sliceMain[g] {
-								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
-							}
-						}
-						// gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
 						turns++
 					}
 				} else {
@@ -166,15 +157,6 @@ func main() {
 						}
 					} else {
 						ko2 = copyBoard(ko2, sliceMain)
-						gameState, err := os.Create("board/"+strconv.Itoa(turns)+".txt")
-						check(err)
-						defer gameState.Close()
-						for g := range sliceMain {
-							for h := range sliceMain[g] {
-								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
-							}
-						}
-						// gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
 						if moveCount {
 							move++
 							turns++
@@ -193,27 +175,11 @@ func main() {
 		revert1 = true
 	}
 	
-	f, err := os.Create("data.txt")
+	f, err := os.Create("complete.txt")
 	check(err)
 	defer f.Close()
+	f.WriteString("Completed!")
 
-	
-	if whoWon == 1 {
-		f.WriteString("1")
-	} else if whoWon == 2 {
-		f.WriteString("2")
-	} else {
-		endGame(sliceMain)
-		if scoreOne>scoreTwo {
-			f.WriteString("1")
-		} else {
-			f.WriteString("2")
-		}
-	}
-	/*
-	f.WriteString(strconv.Itoa(scoreOne))
-	f.WriteString(strconv.Itoa(scoreTwo))
-	*/
 }
 
 func checkIllegal(check []int, sliceMain [][]int) bool {

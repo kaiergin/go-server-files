@@ -27,6 +27,7 @@ go build
 cd ..
 fi
 python recordLeaderboard.py
+python recordGames.py
 fi
 prev=$var
 it=$((it+1))
