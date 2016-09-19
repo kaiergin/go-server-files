@@ -1,11 +1,11 @@
 from lxml import etree
 import time
 
-games = open("games.xml","r")
+games = open("/var/www/html/games.xml","r")
 stuff = etree.parse(games)
 games.close()
 
-games = open("games.xml","w")
+games = open("/var/www/html/games.xml","w")
 
 page = etree.Element('all')
 doc = etree.ElementTree(page)

@@ -5,7 +5,7 @@ users = open("users.xml","r")
 stuff = etree.parse(users)
 users.close()
 
-users = open("users.xml","w")
+users = open("/var/www/html/users.xml","w")
 
 page = etree.Element('invited')
 doc = etree.ElementTree(page)

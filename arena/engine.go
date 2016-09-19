@@ -109,7 +109,7 @@ func main() {
 								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
 							}
 						}
-						gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
+						// gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
 						turns++
 					}
 				} else {
@@ -174,7 +174,7 @@ func main() {
 								gameState.WriteString(strconv.Itoa(sliceMain[g][h]))
 							}
 						}
-						gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
+						// gameState.WriteString("\n" + strconv.Itoa(scoreOne) + strconv.Itoa(scoreTwo))
 						if moveCount {
 							move++
 							turns++

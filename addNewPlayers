@@ -3,7 +3,7 @@ FILES="NewAIs/*"
 BROKEN="BROKEN"
 for x in $FILES
 do
-if [ $x != "NewAIs/*" ];
+if [ $x != "/var/www/html/NewAIs/*" ];
 then
 OUTPUT="$(python checkLegal.py $x)"
 if [ $OUTPUT != $BROKEN ];
